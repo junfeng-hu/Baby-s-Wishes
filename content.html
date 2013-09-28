@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Content</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <style>
+    .title{
+        font-family: times, Times New Roman, times-roman, georgia, serif;
+	    color: #444;
+	    margin-top: 40px;
+        text-align:center;
+	    padding: 0px 0px 6px 0px;
+	    font-size: 51px;
+	    line-height: 44px;
+	    letter-spacing: -2px;
+	    font-weight: bold;
+    }
+    </style>
+   </head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="title">
+                Welcome to Baby's Wishes</h1>
+            <div class="row" style="padding: 0px 0px 10px 55px;margin-top: 70px;">
+                <div class="col-lg-6">
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-info dropdown-toggle" id="buttonSite" data-toggle="dropdown">all site<span class="caret"></span></button>
+                            <ul class="dropdown-menu" id="chooseSite">
+                                <li><a href="#">all site</a></li>
+                                <li><a href="#">taobao</a></li>
+                                <li><a href="#">tmall</a></li>
+                                <li><a href="#">amazon</a></li>
+                                <li><a href="#">jd</a></li>
+                                <li><a href="#">dangdang</a></li>
+                            </ul>
+                        </div><!-- /btn-group -->
+                        <input type="text" class="form-control" id="searchinput" placeholder="Search">
+                        <span class="input-group-btn">
+                            <button class="btn btn-success" type="button" id="searchaction">Search</button>
+                        </span>
+                    </div><!-- /input-group -->
+                </div><!-- /.col-lg-6 -->
+
+                <div class="col-lg-6" style="bottom: 25px;left: 290px;">
+                    <h2>
+                        <small>
+                            <button type="button" class="btn btn-warning" id="select">SELECT ALL</button>
+                            <button type="button" class="btn btn-danger" id="action">DELETE ALL</button>
+                        </small>
+                    </h2>
+                </div>
+
+            </div>
+            <ul class="thumbails" id="content"></ul>
+            <div style="clear:both;"></div>
+            <div class="pagination pagination-centered">
+                </div>
+            </div>
+        <hr>
+        <footer>
+            <div id="more" style="text-align: center;"><button type="button" class="btn btn-primary btn-lg">Watch More</button></div>
+            </footer>
+        </div>
+    </div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="./static/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="./static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="content.js"></script>
+</body>
+</html>

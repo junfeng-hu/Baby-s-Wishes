@@ -1,0 +1,39 @@
+{
+    "manifest_version":2,
+    "name":"Baby's Wish",
+    "version":"1.0",
+    "description":"collect the product's page of taobao,tmall,amazon.jingdong,dangdang",
+    "author":"O1.4",
+    "homepage_url":"http://algu.me",
+    "background":{
+        "scripts":["background.js"]
+    },
+    "browser_action":{
+        "default_icon":"icon.png",
+        "default_popup":"popup.html"
+    },
+    "icons":{
+        "16":"icon.png",
+        "48":"icon.png",
+        "128":"icon.png"
+    },
+    "options_page":"options.html",
+    "permissions":[
+        "http://*.duapp.com/*",
+        "http://127.0.0.1/*"
+    ],
+    "content_scripts":[
+    {
+        "matches":[
+            "http://item.taobao.com/*",
+            "http://detail.tmall.com/*",
+            "http://product.dangdang.com/*",
+            "http://www.amazon.cn/*",
+            "http://item.jd.com/*"
+        ],
+        "css":["button.css"],
+        "js":["button.js"]
+    }
+    ]
+}
+
