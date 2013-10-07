@@ -19,7 +19,13 @@ function sendAjax(data){
         async=false;
     }
     var xhr = new XMLHttpRequest();
-    xhr.open(data.method,server+data.action,async);
+    if (server[server.length-1]=="/") {
+        var actionUrl=server+data.action;
+    }
+    else {
+        var actionUrl=server+"/"+data.action;
+    }
+    xhr.open(data.method,actionUrl,async);
     xhr.onreadystatechange = function() {
         if (xhr.readyState==4) {
             console.log(server+data.action);
