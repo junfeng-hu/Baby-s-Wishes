@@ -149,6 +149,8 @@ function save_options() {
     setTimeout(function() {
         status.innerHTML = "";
     }, 750);
+
+    sendAjax({"action":"list","method":"GET"});
 }
 // Restores select box state to saved value from localStorage.
 function restore_options() {
@@ -172,6 +174,10 @@ function restore_options() {
     var passwd=localStorage.getItem("passwd");
     generate_userinput(username,passwd);
 }
+
+var background=chrome.extension.getBackgroundPage();
+var sendAjax=background.sendAjax;
+
 localStorage.setItem("defaultServer","http://python7.duapp.com");
 document.addEventListener('DOMContentLoaded', restore_options);
 document.querySelector('#sync').addEventListener('click', IsDisplayUserinfo);
