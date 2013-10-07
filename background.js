@@ -10,6 +10,7 @@ function checkUrl(url) {
     return -1;
 }
 function sendAjax(data){
+    //sync=localStorage.getItem("sync");
     if (sync!="yes") {
         console.log("using at no sync to cloud.");
         return;
@@ -28,7 +29,7 @@ function sendAjax(data){
     xhr.open(data.method,actionUrl,async);
     xhr.onreadystatechange = function() {
         if (xhr.readyState==4) {
-            console.log(server+data.action);
+            console.log(actionUrl);
             console.log(xhr.status+":"+xhr.statusText+"\n"+":"+xhr.responseText+"\n"+"type:"+xhr.getResponseHeader("Content-Type"));
             if (xhr.status!=200){
                 return;
@@ -51,6 +52,8 @@ function sendAjax(data){
         xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
     }
     if (data.action=="login"){
+        console.log(user);
+        console.log(passwd);
         xhr.send("username="+user+"&passwd="+passwd);
     }
     if (data.action=="add") {
@@ -114,7 +117,6 @@ function firstInstall() {
     chrome.tabs.create({"url":"options.html"});
 }
 
-chrome.runtime.onInstalled.addListener(firstInstall);
 
 var sync = localStorage.getItem("sync");
 var wishes = JSON.parse(localStorage.getItem("wishes"));
@@ -122,17 +124,21 @@ if (!wishes) {
     localStorage.setItem("wishes",JSON.stringify([]))
     wishes = JSON.parse(localStorage.getItem("wishes"));
 }
+var server=localStorage.getItem("defaultServer");
+var user=localStorage.getItem("username");
+var passwd=localStorage.getItem("passwd");
 if (sync=="yes") {
     var usingPrivate = localStorage.getItem("usingPrivate");
     var user=localStorage.getItem("username");
     var passwd=localStorage.getItem("passwd");
     if (usingPrivate=="true") {
-        var server=localStorage.getItem("server");
+        server=localStorage.getItem("server");
     }
     else {
-        var server=localStorage.getItem("defaultServer");
+        server=localStorage.getItem("defaultServer");
     }
     sendAjax({"action":"login","method":"POST","sync":true});
     sendAjax({"action":"list","method":"GET"});
 }
 chrome.runtime.onMessage.addListener(handlerMessage);
+chrome.runtime.onInstalled.addListener(firstInstall);

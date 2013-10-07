@@ -149,12 +149,18 @@ function save_options() {
     setTimeout(function() {
         status.innerHTML = "";
     }, 750);
-
+    background.sync=sync;
+    background.server=serverinput.value;
+    background.user=userinput.value;
+    background.passwd=passwdinput.value;
+    console.log(sync);
+    console.log(background.sync);
+    sendAjax({"action":"login","method":"POST","sync":true});
     sendAjax({"action":"list","method":"GET"});
 }
 // Restores select box state to saved value from localStorage.
 function restore_options() {
-    var sync = localStorage.getItem("sync");
+    sync = localStorage.getItem("sync");
     if (!sync) {
         sync="yes"; 
     }
