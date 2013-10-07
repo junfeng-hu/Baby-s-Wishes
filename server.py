@@ -3,14 +3,16 @@
 from contextlib import closing
 import hashlib
 from functools import wraps
-from flask import Flask,request,session,g,redirect,url_for,abort,render_template,flash,jsonify
+from flask import Flask,request,session,g,redirect,url_for,abort,render_template,flash,jsonify,json
+from json import loads
+
 
 import MySQLdb
 from MySQLdb.cursors import DictCursor
 
 app = Flask(__name__)
 app.debug='True'
-app.config.from_object("baeconfig")
+app.config.from_object("config")
 app.secret_key=app.config["SECRET_KEY"]
 
 
@@ -192,8 +194,9 @@ def list():
     g.cursor.execute("SELECT id,url,img,title,website FROM wishes_user,wishes WHERE user_id=%s AND wish_id=id",g.user['id'])
     wishes=g.cursor.fetchall()
     data={}
-    for w in wishes:
-        data[w['url']]=w
+    for i,w in enumerate(wishes):
+        data[i]=w
+    data["count"]=i
     return jsonify(data)
 
 
@@ -219,11 +222,15 @@ def add():
 @app.route('/delete',methods=['POST'])
 @login_required
 def delete():
-    url=request.form.get('url')
-    g.cursor.execute("SELECT id FROM wishes WHERE url=%s",url)
-    wish_id=g.cursor.fetchone()['id']
-    g.cursor.execute("DELETE FROM wishes_user WHERE wish_id=%s AND user_id=%s",(wish_id,g.user['id']))
-    g.cursor.execute("DELETE FROM wishes WHERE id=%s",wish_id)
+    urls=loads(request.form.get('url'))
+    for url in urls:
+        g.cursor.execute("SELECT id FROM wishes WHERE url=%s",url)
+        wish=g.cursor.fetchone()
+        if not wish:
+            return jsonify({"rep":"not found"})
+        wish_id=wish["id"]
+        g.cursor.execute("DELETE FROM wishes_user WHERE wish_id=%s AND user_id=%s",(wish_id,g.user['id']))
+        g.cursor.execute("DELETE FROM wishes WHERE id=%s",wish_id)
     g.db.commit()
     return jsonify({'rep':'ok'})
 
