@@ -10,12 +10,35 @@ function checkUrl(url) {
     return -1;
 }
 function sendAjax(data){
+    if (sync!="yes") {
+        console.log("using at no sync to cloud.");
+        return;
+    }
+    var async=true;
+    if (data.sync==true){
+        async=false;
+    }
     var xhr = new XMLHttpRequest();
-    console.log(server+data.action);
-    xhr.open(data.method,server+data.action,true);
+    xhr.open(data.method,server+data.action,async);
     xhr.onreadystatechange = function() {
         if (xhr.readyState==4) {
-            console.log(xhr.status+":"+xhr.statusText+"\n"+":"+xhr.responseText);
+            console.log(server+data.action);
+            console.log(xhr.status+":"+xhr.statusText+"\n"+":"+xhr.responseText+"\n"+"type:"+xhr.getResponseHeader("Content-Type"));
+            if (xhr.status!=200){
+                return;
+            }
+            if (data.action=="list"&&xhr.getResponseHeader("Content-Type")=="application/json") {
+                wishes=[];
+                var getWishes=JSON.parse(xhr.responseText);
+                for (var i=0;i<=getWishes["count"];++i) {
+                    var item=getWishes[i];
+                    delete item["id"];
+                    delete item["website"];
+                    console.log(item);
+                    wishes.push(getWishes[i]);
+                }
+                localStorage.setItem("wishes",JSON.stringify(wishes));
+            }
         }
     }
     if (data.method=="POST"){
@@ -30,6 +53,9 @@ function sendAjax(data){
     if (data.action=="delete") {
         xhr.send("url="+data.url);
     }
+    if (data.action=="list") {
+        xhr.send();
+    }
 }
 function handlerMessage(request,sender,sendResponse) {
     if (request.from=="content_script") {
@@ -42,6 +68,11 @@ function handlerMessage(request,sender,sendResponse) {
             return true;
         }
         else if (request.action=="collect") {
+            var index=checkUrl(request.url);
+            if (index!=-1) {
+                sendResponse({"rep":"already collected"});
+                return true;
+            }
             data={"action":"add","method":"POST","url":encodeURIComponent(request.url),"img":request.img,"title":request.title};
             console.log("add:"+request.url);
             sendAjax(data);
@@ -52,10 +83,16 @@ function handlerMessage(request,sender,sendResponse) {
         }
         else { 
             if (request.action=="uncollect") {
-                console.log("delete:"+request.url);
-                data={"action":"delete","method":"POST","url":encodeURIComponent(request.url)};
-                sendAjax(data);
                 var index=checkUrl(request.url);
+                if (index==-1) {
+                    sendResponse({"rep":"not found"});
+                    return true;
+                }
+                console.log("delete:"+request.url);
+                itemsTodelete=[];
+                itemsTodelete.push(encodeURIComponent(request.url));
+                data={"action":"delete","method":"POST","url":JSON.stringify(itemsTodelete)};
+                sendAjax(data);
                 wishes[index]="";
                 localStorage.setItem("wishes",JSON.stringify(wishes))
                 sendResponse({"rep":"ok"});
@@ -67,6 +104,12 @@ function handlerMessage(request,sender,sendResponse) {
 
     }
 }
+function firstInstall() {
+    chrome.tabs.create({"url":"options.html"});
+}
+
+chrome.runtime.onInstalled.addListener(firstInstall);
+
 var sync = localStorage.getItem("sync");
 var wishes = JSON.parse(localStorage.getItem("wishes"));
 if (!wishes) {
@@ -78,11 +121,12 @@ if (sync=="yes") {
     var user=localStorage.getItem("username");
     var passwd=localStorage.getItem("passwd");
     if (usingPrivate=="true") {
-        server=localStorage.getItem("server");
+        var server=localStorage.getItem("server");
     }
     else {
-        server=localStorage.getItem("defaultServer");
+        var server=localStorage.getItem("defaultServer");
     }
-    sendAjax({"action":"login","method":"POST"});
+    sendAjax({"action":"login","method":"POST","sync":true});
+    sendAjax({"action":"list","method":"GET"});
 }
 chrome.runtime.onMessage.addListener(handlerMessage);

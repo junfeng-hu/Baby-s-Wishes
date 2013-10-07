@@ -36,6 +36,25 @@ function displayContent() {
         img.style.width="250px";
         a.appendChild(img);
 
+        var editdiv=document.createElement("div");
+        editdiv.style.display="none";
+        editdiv.style.backgroundColor="white";
+        editdiv.style.opacity=0.7;
+        editdiv.style.position="absolute";
+        editdiv.style.width="235px";
+        editdiv.style.top="225px";
+        //tags="<a href=\"#deleteone\" title=\"delete this\" style=\"padding:0px 175px 0px 5px;font-size:20px\">\
+        //                   <span class=\"glyphicon glyphicon-remove-circle\"></span></a>
+        //                   <a href=\"#addtags\" title=\"add tags\" style=\"font-size:20px;\"><span class=\"glyphicon glyphicon-tags\"></span></a>";
+        editdiv.innerHTML="<a href=\"#deleteone\" title=\"delete this\" style=\"padding-left:210px;font-size:20px\">\
+                           <span class=\"glyphicon glyphicon-remove-circle\"></span></a>";
+
+        editdiv.addEventListener("click",handleEdit);
+        div.appendChild(editdiv);
+        div.addEventListener("mouseover",displayEdit);
+        div.addEventListener("mouseout",displayEdit);
+        
+
         var check=document.createElement("input");
         check.type="checkbox";
         check.name="wish_id";
@@ -70,6 +89,34 @@ function selectAll() {
     allSelected=!allSelected;
 }
 
+function deleteAll() {
+    var checks=document.getElementsByName("wish_id");
+    var itemsTodelete=[];
+    var nodesTodelete=[];
+    for (var i=0;i<checks.length;++i) {
+        var c=checks[i];
+        if (c.checked) {
+            nodesTodelete.push(checks[i].parentNode.parentNode.parentNode);
+            itemsTodelete.push(encodeURIComponent(c.value));
+            for (var j=0;j<wishes.length;++j) {
+                var item=wishes[j];
+                if (item==""){
+                    continue;
+                }
+                if (item.url==c.value) {
+                    wishes[j]="";
+                }
+            }
+        }
+    }
+    for (var i=0;i<nodesTodelete.length;++i) {
+        ul.removeChild(nodesTodelete[i]);
+    }
+    localStorage.setItem("wishes",JSON.stringify(wishes));
+    data={"action":"delete","method":"POST","url":JSON.stringify(itemsTodelete)};    
+    sendAjax(data);
+}
+
 function chooseSite(e) {
     var target=e.target;
     var button=document.getElementById("buttonSite");
@@ -82,7 +129,6 @@ function chooseSite(e) {
     cur=0;
     ul.innerText="";
     displayContent();
-    cur=0;
 }
 
 function searchAction() {
@@ -91,7 +137,6 @@ function searchAction() {
     cur=0;
     ul.innerText="";
     displayContent();
-    cur=0;
 }
 
 function enterAction(e) {
@@ -100,11 +145,53 @@ function enterAction(e) {
     }
 }
 
+function displayEdit(e) {
+    if (e.type=="mouseover") {
+        e.currentTarget.childNodes[1].style.display="block";
+    }
+    else {
+        e.currentTarget.childNodes[1].style.display="none";
+    }
+}
+
+function handleEdit(e) {
+    var a=e.target.parentNode;
+    console.log(a);
+    var tem=a.href.split("#");
+
+    if (tem[tem.length-1]=="deleteone") {
+        var itemTodelete=[];
+        itemTodelete.push(encodeURIComponent(a.parentNode.previousSibling.href));
+        for (var j=0;j<wishes.length;++j) {
+            var item=wishes[j];
+            if (item==""){
+                continue;
+            }
+            if (item.url==a.parentNode.previousSibling.href) {
+                wishes[j]="";
+            }            
+        }
+        ul.removeChild(a.parentNode.parentNode.parentNode);
+        localStorage.setItem("wishes",JSON.stringify(wishes));
+        data={"action":"delete","method":"POST","url":JSON.stringify(itemTodelete)};    
+        sendAjax(data);
+    }
+    else {
+        if (tem[tem.length-1]=="addtags") {
+            
+        }
+        else {
+            console.log("error in handleEdit");
+        }
+    }
+}
+var background=chrome.extension.getBackgroundPage();
 var itemsPerpage=8;
 var allSelected=false;
 var website="";
 var searchtext="";
-var wishes=JSON.parse(localStorage.getItem("wishes"));
+var wishes=background.wishes;
+var sendAjax=background.sendAjax;
 var ul=document.getElementById("content");
 var cur=0;
 ul.style.listStyle="none";
@@ -113,6 +200,7 @@ console.log(wishes);
 document.addEventListener("DOMContentLoaded",displayContent);
 document.getElementById("more").addEventListener("click",displayContent);
 document.getElementById("select").addEventListener("click",selectAll);
+document.getElementById("delete").addEventListener("click",deleteAll);
 document.getElementById("chooseSite").addEventListener("click",chooseSite);
 
 document.getElementById("searchaction").addEventListener("click",searchAction);

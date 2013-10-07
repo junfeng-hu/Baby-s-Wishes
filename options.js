@@ -172,7 +172,7 @@ function restore_options() {
     var passwd=localStorage.getItem("passwd");
     generate_userinput(username,passwd);
 }
-localStorage.setItem("defaultServer","http://algu.me");
+localStorage.setItem("defaultServer","http://python7.duapp.com");
 document.addEventListener('DOMContentLoaded', restore_options);
 document.querySelector('#sync').addEventListener('click', IsDisplayUserinfo);
 document.querySelector('#save').addEventListener('click',save_options);
