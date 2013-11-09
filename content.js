@@ -1,14 +1,16 @@
-function displayContent() {
+function displayContent(e) {
+    if (e&&e.type=="mousewheel"&&e.wheelDelta==120){return;}
+    console.log("changeSite");
     var count=0;
     for (;cur<wishes.length;++cur) {
         var item=wishes[cur];
         if (item=="") {
             continue;
         }
+
         if (count==itemsPerpage) {
             break;
         }
-
         if (item.url.split("/")[2].search(website)==-1) {
             continue;
         }
@@ -19,6 +21,9 @@ function displayContent() {
         }
         var li=document.createElement("li");
         li.className="col-md-3";
+        li.style.position="absolute"
+        li.style.left=(count%4)*25+"%"
+        li.style.top=bottoms[count%4]+"px";
 
         var div=document.createElement("div");
         div.className="thumbnail pagination-centered";
@@ -32,8 +37,9 @@ function displayContent() {
         var img=document.createElement("img");
         img.src=item.img;
         img.className="img-thumbnail img-responsive";
-        img.style.height="250px";
-        img.style.width="250px";
+        img.addEventListener("load",lazyLoad);
+        //img.style.height="250px";
+        //img.style.width="250px";
         a.appendChild(img);
 
         var editdiv=document.createElement("div");
@@ -41,19 +47,18 @@ function displayContent() {
         editdiv.style.backgroundColor="white";
         editdiv.style.opacity=0.7;
         editdiv.style.position="absolute";
-        editdiv.style.width="235px";
-        editdiv.style.top="225px";
+        editdiv.style.width="245px";
+        editdiv.style.bottom="90px";
         //tags="<a href=\"#deleteone\" title=\"delete this\" style=\"padding:0px 175px 0px 5px;font-size:20px\">\
         //                   <span class=\"glyphicon glyphicon-remove-circle\"></span></a>
         //                   <a href=\"#addtags\" title=\"add tags\" style=\"font-size:20px;\"><span class=\"glyphicon glyphicon-tags\"></span></a>";
-        editdiv.innerHTML="<a href=\"#deleteone\" title=\"delete this\" style=\"padding-left:210px;font-size:20px\">\
+        editdiv.innerHTML="<a href=\"#deleteone\" title=\"delete this\" style=\"padding-left:220px;font-size:20px\">\
                            <span class=\"glyphicon glyphicon-remove-circle\"></span></a>";
 
         editdiv.addEventListener("click",handleEdit);
         div.appendChild(editdiv);
         div.addEventListener("mouseover",displayEdit);
         div.addEventListener("mouseout",displayEdit);
-        
 
         var check=document.createElement("input");
         check.type="checkbox";
@@ -73,11 +78,28 @@ function displayContent() {
         div.appendChild(h4);
 
         li.appendChild(div);
+        if (count>=4){
+            lazylis.push(li);
+            count++;
+            continue;
+        }
 
         ul.appendChild(li);
+
         count++;
     }
-    
+}
+function lazyLoad(e){
+    var topli=e.target.parentNode.parentNode.parentNode;
+    var i=Number(topli.style.left.slice(0,topli.style.left.length-1))/25;
+    bottoms[i]=Number(topli.style.top.slice(0,topli.style.top.length-2))+Number(topli.clientHeight);
+    var curli=lazylis.shift();
+    if (!curli){
+        return ;
+    }
+    curli.style.top=Number(topli.style.top.slice(0,topli.style.top.length-2))+Number(topli.clientHeight)+"px";
+    curli.style.left=topli.style.left;
+    ul.appendChild(curli);
 }
 
 function selectAll() {
@@ -115,6 +137,10 @@ function deleteAll() {
     localStorage.setItem("wishes",JSON.stringify(wishes));
     data={"action":"delete","method":"POST","url":JSON.stringify(itemsTodelete)};    
     sendAjax(data);
+    cur=0;
+    ul.innerText="";
+    bottoms=[0,0,0,0];
+    displayContent();
 }
 
 function chooseSite(e) {
@@ -128,6 +154,7 @@ function chooseSite(e) {
     }
     cur=0;
     ul.innerText="";
+    bottoms=[0,0,0,0];
     displayContent();
 }
 
@@ -136,6 +163,7 @@ function searchAction() {
     searchtext=input.value;
     cur=0;
     ul.innerText="";
+    bottoms=[0,0,0,0];
     displayContent();
 }
 
@@ -169,24 +197,30 @@ function handleEdit(e) {
             }
             if (item.url==a.parentNode.previousSibling.href) {
                 wishes[j]="";
-            }            
+            }
         }
         ul.removeChild(a.parentNode.parentNode.parentNode);
         localStorage.setItem("wishes",JSON.stringify(wishes));
         data={"action":"delete","method":"POST","url":JSON.stringify(itemTodelete)};    
         sendAjax(data);
+        cur=0;
+        ul.innerText="";
+        bottoms=[0,0,0,0];
+        displayContent();
     }
     else {
         if (tem[tem.length-1]=="addtags") {
-            
         }
         else {
             console.log("error in handleEdit");
         }
     }
 }
+
 var background=chrome.extension.getBackgroundPage();
 var itemsPerpage=8;
+var bottoms=[0,0,0,0];
+var lazylis=[];
 var allSelected=false;
 var website="";
 var searchtext="";
@@ -198,10 +232,11 @@ ul.style.listStyle="none";
 console.log(wishes);
 
 document.addEventListener("DOMContentLoaded",displayContent);
-document.getElementById("more").addEventListener("click",displayContent);
+window.addEventListener("mousewheel",displayContent);
 document.getElementById("select").addEventListener("click",selectAll);
 document.getElementById("delete").addEventListener("click",deleteAll);
 document.getElementById("chooseSite").addEventListener("click",chooseSite);
 
 document.getElementById("searchaction").addEventListener("click",searchAction);
 document.getElementById("searchinput").addEventListener("keypress",enterAction);
+
