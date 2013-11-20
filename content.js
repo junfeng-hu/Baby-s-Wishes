@@ -32,8 +32,9 @@ function displayContent() {
         var img=document.createElement("img");
         img.src=item.img;
         img.className="img-thumbnail img-responsive";
-        img.style.height="250px";
-        img.style.width="250px";
+        //img.style.width="235px";
+        img.style.height="235px";
+        //img.addEventListener("load",imgLoad);
         a.appendChild(img);
 
         var editdiv=document.createElement("div");
@@ -42,7 +43,7 @@ function displayContent() {
         editdiv.style.opacity=0.7;
         editdiv.style.position="absolute";
         editdiv.style.width="235px";
-        editdiv.style.top="225px";
+        editdiv.style.top="210px";
         //tags="<a href=\"#deleteone\" title=\"delete this\" style=\"padding:0px 175px 0px 5px;font-size:20px\">\
         //                   <span class=\"glyphicon glyphicon-remove-circle\"></span></a>
         //                   <a href=\"#addtags\" title=\"add tags\" style=\"font-size:20px;\"><span class=\"glyphicon glyphicon-tags\"></span></a>";
