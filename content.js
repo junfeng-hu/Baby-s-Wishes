@@ -42,12 +42,12 @@ function displayContent() {
         editdiv.style.backgroundColor="white";
         editdiv.style.opacity=0.7;
         editdiv.style.position="absolute";
-        editdiv.style.width="235px";
+        //editdiv.style.width="235px";
         editdiv.style.top="210px";
         //tags="<a href=\"#deleteone\" title=\"delete this\" style=\"padding:0px 175px 0px 5px;font-size:20px\">\
         //                   <span class=\"glyphicon glyphicon-remove-circle\"></span></a>
         //                   <a href=\"#addtags\" title=\"add tags\" style=\"font-size:20px;\"><span class=\"glyphicon glyphicon-tags\"></span></a>";
-        editdiv.innerHTML="<a href=\"#deleteone\" title=\"delete this\" style=\"padding-left:210px;font-size:20px\">\
+        editdiv.innerHTML="<a href=\"#deleteone\" title=\"delete this\" style=\"font-size:20px\">\
                            <span class=\"glyphicon glyphicon-remove-circle\"></span></a>";
 
         editdiv.addEventListener("click",handleEdit);
@@ -115,7 +115,13 @@ function deleteAll() {
     }
     localStorage.setItem("wishes",JSON.stringify(wishes));
     data={"action":"delete","method":"POST","url":JSON.stringify(itemsTodelete)};    
-    sendAjax(data);
+    try {
+        sendAjax({"action":"login","method":"POST","sync":true});
+        sendAjax(data);
+    }
+    catch(err){
+        console.log(err);
+    }
 }
 
 function chooseSite(e) {
@@ -175,11 +181,17 @@ function handleEdit(e) {
         ul.removeChild(a.parentNode.parentNode.parentNode);
         localStorage.setItem("wishes",JSON.stringify(wishes));
         data={"action":"delete","method":"POST","url":JSON.stringify(itemTodelete)};    
-        sendAjax(data);
+        try {
+            sendAjax({"action":"login","method":"POST","sync":true});
+            sendAjax(data);
+        }
+        catch(err){
+            console.log(err);
+        }
     }
     else {
         if (tem[tem.length-1]=="addtags") {
-            
+            console.log("to do add tags")
         }
         else {
             console.log("error in handleEdit");

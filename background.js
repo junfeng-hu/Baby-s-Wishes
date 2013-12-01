@@ -49,7 +49,7 @@ function sendAjax(data){
         }
     }
     if (data.method=="POST"){
-        xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+            xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
     }
     if (data.action=="login"){
         console.log(user);
@@ -137,8 +137,16 @@ if (sync=="yes") {
     else {
         server=localStorage.getItem("defaultServer");
     }
-    sendAjax({"action":"login","method":"POST","sync":true});
-    sendAjax({"action":"list","method":"GET"});
+    try {
+        sendAjax({"action":"login","method":"POST","sync":true});
+        sendAjax({"action":"list","method":"GET"});
+    }
+    catch(err) {
+        console.log(err);
+    }
+
+
 }
+
 chrome.runtime.onMessage.addListener(handlerMessage);
 chrome.runtime.onInstalled.addListener(firstInstall);
