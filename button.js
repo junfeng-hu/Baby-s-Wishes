@@ -57,7 +57,7 @@ function getImg() {
             imgsrc=document.getElementById("largePic").src;
             break;
         case "www.amazon.cn" :
-            imgsrc=document.getElementById("original-main-image").src;
+            imgsrc=document.getElementById("main-image").src;
             break;
         case "item.jd.com":
             imgsrc=document.getElementById("spec-n1").getElementsByTagName("img")[0].src;
