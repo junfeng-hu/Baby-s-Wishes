@@ -48,10 +48,10 @@ function getImg() {
     var imgsrc;
     switch(domin) {
         case "detail.tmall.com" :
-            imgsrc=document.querySelector("span#J_ImgBooth").attributes.getNamedItem("src").value;
+            imgsrc=document.querySelector("#J_ImgBooth").attributes.getNamedItem("src").value;
             break;
         case "item.taobao.com" :
-            imgsrc=document.querySelector("img#J_ImgBooth").src;
+            imgsrc=document.querySelector("#J_ImgBooth").src;
             break;
         case "product.dangdang.com" :
             imgsrc=document.getElementById("largePic").src;

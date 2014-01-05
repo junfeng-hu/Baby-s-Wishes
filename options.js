@@ -155,8 +155,13 @@ function save_options() {
     background.passwd=passwdinput.value;
     console.log(sync);
     console.log(background.sync);
-    sendAjax({"action":"login","method":"POST","sync":true});
-    sendAjax({"action":"list","method":"GET"});
+    try{
+        sendAjax({"action":"login","method":"POST","sync":true});
+        sendAjax({"action":"list","method":"GET"});
+    }
+    catch(err){
+        console.log(err);
+    }
 }
 // Restores select box state to saved value from localStorage.
 function restore_options() {
