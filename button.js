@@ -45,7 +45,7 @@ function insertButton() {
 function getImg() {
      var domin=document.URL.split("/")[2];
     console.log(domin);
-    var imgsrc;
+    var imgsrc,img;
     switch(domin) {
         case "detail.tmall.com" :
             imgsrc=document.querySelector("#J_ImgBooth").attributes.getNamedItem("src").value;
@@ -57,7 +57,11 @@ function getImg() {
             imgsrc=document.getElementById("largePic").src;
             break;
         case "www.amazon.cn" :
-            imgsrc=document.getElementById("main-image").src;
+            img=document.getElementById("main-image");
+            if (!img){
+                img=document.getElementById("original-main-image");
+            }
+            imgsrc=img.src;
             break;
         case "item.jd.com":
             imgsrc=document.getElementById("spec-n1").getElementsByTagName("img")[0].src;
